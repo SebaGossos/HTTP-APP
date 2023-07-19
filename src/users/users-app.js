@@ -2,6 +2,7 @@ import { renderAddButton } from "./presentation/render-add-button/render-add-but
 import { renderButtons } from "./presentation/render-buttons/render-buttons"
 import { renderModals } from "./presentation/render-modal/render-modal"
 import { renderTable } from "./presentation/render-table/render-table"
+import { saveUser } from "./use-cases/save-user"
 import usersStore from "./store/users-store"
 
 /**
@@ -9,7 +10,6 @@ import usersStore from "./store/users-store"
  * @param {HTMLDivElement} element 
  */
 export const UsersApp = async( element ) => {
-
 
     element.innerHTML = `Loading...`
     await usersStore.loadNextPage()
@@ -19,5 +19,9 @@ export const UsersApp = async( element ) => {
     renderTable( element )
     renderButtons( element )
     renderAddButton( element )
-    renderModals( element )
+    renderModals( element, async( userLike ) => {
+        const user = await saveUser( userLike )
+        usersStore.onUserChanged( user )
+        renderTable()
+    })
 }

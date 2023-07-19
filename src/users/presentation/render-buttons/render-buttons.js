@@ -24,7 +24,7 @@ export const renderButtons = ( element ) => {
 
     nextButton.addEventListener('click', async() => {
         await usersStore.loadNextPage();
-        currentPageLabel.innerText = `${usersStore.getCurrentPage()}`
+        currentPageLabel.innerText = usersStore.getCurrentPage()
         renderTable( element )
     })
 

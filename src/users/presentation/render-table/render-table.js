@@ -1,4 +1,6 @@
 import usersStore from '../../store/users-store'
+import { deleteUserById } from '../../use-cases/delete-user-by-id'
+import { showModal } from '../render-modal/render-modal'
 import './render-table.css'
 
 let table
@@ -25,6 +27,37 @@ const createTable = () => {
 
 /**
  * 
+ * @param {MouseEvent} event 
+ */
+const tableSelectListener = ( event ) => {
+    const element = event.target.closest('.select-user')
+    if(!element) return
+
+    const id = element.getAttribute('data-id')
+    showModal( id )
+}
+/**
+ * 
+ * @param {MouseEvent} event 
+ */
+const tableDeleteListener = async( event ) => {
+    const element = event.target.closest('.delete-user')
+    if(!element) return
+
+    const id = element.getAttribute('data-id')
+    try {
+        await deleteUserById( id )
+        await usersStore.reloadPage()
+        document.querySelector('#current-page').innerText = usersStore.getCurrentPage()
+        renderTable()
+
+    } catch (error) {
+        alert(`No se pudo eliminar, Error: ${error}`)
+    }
+}
+
+/**
+ * 
  * @param {HTMLDivElement} element 
  */
 export const renderTable = ( element ) => {
@@ -35,7 +68,8 @@ export const renderTable = ( element ) => {
         table = createTable()
         element.append( table )
 
-        //TODO: listeners a la table
+        table.addEventListener('click', tableSelectListener )
+        table.addEventListener('click', tableDeleteListener )
     }
 
     let tableHtml = ``
@@ -49,10 +83,10 @@ export const renderTable = ( element ) => {
                 <td>${user.lastName}</td>
                 <td>${user.isActive}</td>
                 <td>
-                    <a href="#/" data-id="${ user.id }">Select</a>
-
-                    <a href="#/" data-id="${ user.id }">Delete</a>
-                </td>
+                <a href="#/" class="select-user" data-id="${ user.id }">Select</a>
+                
+                <a href="#/" class="delete-user" data-id="${ user.id }">Delete</a>
+                    </td>
             </tr>
         `
     })
